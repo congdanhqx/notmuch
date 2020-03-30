@@ -411,20 +411,14 @@ fi
 
 printf "Reading libnotmuch version from source... "
 cat > _libversion.c <<EOF
-#include <stdio.h>
 #include "lib/notmuch.h"
-int main(void) {
-    printf("libnotmuch_version_major=%d\n",
-		LIBNOTMUCH_MAJOR_VERSION);
-    printf("libnotmuch_version_minor=%d\n",
-		LIBNOTMUCH_MINOR_VERSION);
-    printf("libnotmuch_version_release=%d\n",
-		LIBNOTMUCH_MICRO_VERSION);
-    return 0;
-}
+libnotmuch_version_major=LIBNOTMUCH_MAJOR_VERSION
+libnotmuch_version_minor=LIBNOTMUCH_MINOR_VERSION
+libnotmuch_version_release=LIBNOTMUCH_MICRO_VERSION
 EOF
-if ${CC} ${CFLAGS} -I"$srcdir" _libversion.c -o _libversion > /dev/null 2>&1 \
-       && ./_libversion > _libversion.sh && . ./_libversion.sh
+if ${CPP} ${CPPFLAGS} -I"$srcdir" _libversion.c -o _libversion.sh.in > /dev/null 2>&1 \
+       && tail -3 ./_libversion.sh.in >_libversion.sh \
+       && . ./_libversion.sh
 then
     printf "OK.\n"
 else
@@ -434,7 +428,7 @@ else
 Please try running configure again in a clean environment, and if the
 problem persists, report a bug.
 EOF
-    rm -f _libversion _libversion.c _libversion.sh
+    rm -f _libversion.c _libversion.sh _libversion.sh.in
     exit 1
 fi
 
