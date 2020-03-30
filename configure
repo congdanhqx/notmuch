@@ -85,6 +85,7 @@ fi
 BASHCMD=${BASHCMD:-bash}
 PERL=${PERL:-perl}
 CC=${CC:-cc}
+CPP=${CPP:-cpp}
 CXX=${CXX:-c++}
 CFLAGS=${CFLAGS:--g -O2}
 CPPFLAGS=${CPPFLAGS:-}
@@ -135,6 +136,7 @@ First, some common variables can specified via environment variables:
 
 	CC		The C compiler to use
 	CFLAGS		Flags to pass to the C compiler
+	CPP		The C PreProcessor to use
 	CPPFLAGS	Flags to pass to the C preprocessor
 	CXX		The C++ compiler to use
 	CXXFLAGS	Flags to pass to the C compiler
@@ -359,6 +361,18 @@ EOF
 
 errors=0
 printf "int main(void){return 0;}\n" > minimal.c
+
+printf "Sanity checking C preprocessor... "
+test_cmdline="${CPP} ${CPPFLAGS} minimal.c -o minimal"
+if  ${test_cmdline} > /dev/null 2>&1
+then
+    printf "OK.\n"
+else
+    printf "Fail.\n"
+    errors=$((errors + 1))
+    printf Executed:; printf ' %s' ${test_cmdline}; echo
+    ${test_cmdline}
+fi
 
 printf "Sanity checking C compilation environment... "
 test_cmdline="${CC} ${CFLAGS} ${CPPFLAGS} minimal.c ${LDFLAGS} -o minimal"
